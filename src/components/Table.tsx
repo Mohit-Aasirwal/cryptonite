@@ -18,7 +18,7 @@ const Table = ({
   onRowClick,
   itemsPerPage,
 }: TableTypes) => {
-  const [sortConfig, setSortConfig] = useState(null);
+  const [sortConfig, setSortConfig] = useState<any>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -40,7 +40,7 @@ const Table = ({
 
   const filteredData = useMemo(() => {
     return sortedData.filter((item) =>
-      columns.some((column) =>
+      columns.some((column: any) =>
         String(item[column.accessor])
           .toLowerCase()
           .includes(searchTerm.toLowerCase())
@@ -55,7 +55,7 @@ const Table = ({
 
   const pageCount = Math.ceil(filteredData.length / itemsPerPage);
 
-  const requestSort = (key) => {
+  const requestSort = (key: any) => {
     let direction = "ascending";
     if (
       sortConfig &&
@@ -67,14 +67,14 @@ const Table = ({
     setSortConfig({ key, direction });
   };
 
-  const getClassNamesFor = (name) => {
+  const getClassNamesFor = (name: any) => {
     if (!sortConfig) {
       return;
     }
     return sortConfig.key === name ? sortConfig.direction : undefined;
   };
 
-  const handlePageChange = (page) => {
+  const handlePageChange = (page: any) => {
     setCurrentPage(page);
   };
 
