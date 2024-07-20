@@ -41,7 +41,9 @@ export default function RootLayout({
             {!isLoading && (
               <div className="bg-gradient-to-t from-white via-yellow-50 to-[#FEFBD8] dark:bg-gradient-to-r select-none overflow-x-hidden dark:from-[#17153B] dark:to-[#070F2B]">
                 <Header />
-                <Sidebar />
+                <div className="relative z-50">
+                  <Sidebar />
+                </div>
                 {children}
               </div>
             )}
