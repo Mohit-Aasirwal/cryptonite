@@ -1,4 +1,5 @@
 "use client";
+"use client";
 import React, { useState, useEffect } from "react";
 import {
   LineChart,
@@ -14,67 +15,60 @@ import {
   ReferenceLine,
 } from "recharts";
 
-const Graph = () => {
+const Graph = ({ graphType }: any) => {
   const [data, setData] = useState([]);
-  const [graphType, setGraphType] = useState("line");
-  const [currencies, setCurrencies] = useState(["BTC", "ETH", "XRP"]);
 
-  useEffect(() => {
-    const fetchData = () => {
-      // Simulating live data fetch
-      const newDataPoint = currencies.reduce((acc, currency) => {
-        const open = Math.random() * 1000;
-        const close = Math.random() * 1000;
-        acc[currency] = {
-          price: (open + close) / 2,
-          open: open,
-          close: close,
-          high: Math.max(open, close) + Math.random() * 50,
-          low: Math.min(open, close) - Math.random() * 50,
-        };
-        return acc;
-      }, {});
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const response = await fetch(
+  //         "https://api.coingecko.com/api/v3/global/?x_cg_api_key=CG-tvKmAT1u9LEXA2qCF1dkeJHw"
+  //       );
+  //       const jsonData = await response.json();
+  //       console.log(jsonData.data);
+  //       const formattedData = jsonData.total_market_cap.map(
+  //         ([name, marketCap]) => ({
+  //           name: name,
+  //           marketCap: marketCap / 1e9, // Convert to billions
+  //         })
+  //       );
+  //       setData(formattedData);
+  //     } catch (error) {
+  //       console.error("Error fetching data:", error);
+  //     }
+  //   };
 
-      setData((prevData) => [
-        ...prevData.slice(-100),
-        { time: new Date().toLocaleTimeString(), ...newDataPoint },
-      ]);
-    };
+  //   fetchData();
+  //   // const interval = setInterval(fetchData, 60000); // Fetch data every minute
 
-    const interval = setInterval(fetchData, 20000); // Fetch data every second
-
-    return () => clearInterval(interval);
-  }, [currencies]);
-
-  const toggleGraphType = () => {
-    setGraphType((prevType) => (prevType === "line" ? "candle" : "line"));
-  };
+  //   // return () => clearInterval(interval);
+  // }, []);
 
   const renderLineChart = () => (
     <LineChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-      <XAxis dataKey="time" />
+      <XAxis dataKey="name" />
       <YAxis />
-      <Tooltip />
+      {/* <Tooltip formatter={(value) => `$${value.toFixed(2)}B`} /> */}
       <Legend />
-      <Brush dataKey="time" height={30} stroke="#8884d8" />
-      {currencies.map((currency, index) => (
-        <Line
-          type="monotone"
-          dataKey={`${currency}.price`}
-          stroke={`#${Math.floor(Math.random() * 16777215).toString(16)}`}
-          key={index}
-        />
-      ))}
+      <Brush dataKey="name" height={30} stroke="#8884d8" />
+      <Line
+        type="monotone"
+        dataKey="marketCap"
+        stroke="#8884d8"
+        name="Global Market Cap"
+      />
     </LineChart>
   );
 
   const renderCandlestickChart = () => (
     <BarChart data={data} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-      <XAxis dataKey="time" />
+      <XAxis dataKey="name" />
       <YAxis domain={["auto", "auto"]} />
       <Tooltip
+        // formatter={(value) => `$${value.toFixed(2)}B`}
         content={({ payload, label }) => {
           if (payload && payload.length) {
+            const marketCap = payload[0].value;
             return (
               <div
                 className="custom-tooltip"
@@ -84,24 +78,8 @@ const Graph = () => {
                   border: "1px solid #ccc",
                 }}
               >
-                <p>{`Time: ${label}`}</p>
-                {payload.map((entry, index) => {
-                  const currencyData = entry.payload[entry.name];
-                  if (currencyData) {
-                    return (
-                      <p key={index} style={{ color: entry.color }}>
-                        {`${entry.name}: Open: ${
-                          currencyData.open?.toFixed(2) || "N/A"
-                        }, Close: ${
-                          currencyData.close?.toFixed(2) || "N/A"
-                        }, High: ${
-                          currencyData.high?.toFixed(2) || "N/A"
-                        }, Low: ${currencyData.low?.toFixed(2) || "N/A"}`}
-                      </p>
-                    );
-                  }
-                  return null;
-                })}
+                <p>{`Date: ${label}`}</p>
+                {/* <p>{`Global Market Cap: $${marketCap.toFixed(2)}B`}</p> */}
               </div>
             );
           }
@@ -109,60 +87,24 @@ const Graph = () => {
         }}
       />
       <Legend />
-      <Brush dataKey="time" height={30} stroke="#8884d8" />
-      {currencies.map((currency, index) => {
-        const color = `#${Math.floor(Math.random() * 16777215).toString(16)}`;
-        return (
-          <React.Fragment key={index}>
-            <Bar dataKey={`${currency}.open`} fill={color} opacity={0} />
-            <Bar dataKey={`${currency}.close`} fill={color} opacity={0} />
-            <ReferenceLine
-              yAxisId={0}
-              ifOverflow="extendDomain"
-              segment={[
-                { x: "time", y: `${currency}.low` },
-                { x: "time", y: `${currency}.high` },
-              ]}
-              stroke={color}
-            />
-            <Bar
-              dataKey={`${currency}.open`}
-              fill={color}
-              stroke={color}
-              yAxisId={0}
-              name={currency}
-            >
-              {data.map((entry, entryIndex) => {
-                const currencyData = entry[currency];
-                if (currencyData && currencyData.close !== undefined) {
-                  return (
-                    <ReferenceLine
-                      key={entryIndex}
-                      y={currencyData.close}
-                      stroke={color}
-                      strokeWidth={3}
-                      ifOverflow="extendDomain"
-                      segment={[
-                        { x: entryIndex - 0.2 },
-                        { x: entryIndex + 0.2 },
-                      ]}
-                    />
-                  );
-                }
-                return null;
-              })}
-            </Bar>
-          </React.Fragment>
-        );
-      })}
+      <Brush dataKey="name" height={30} stroke="#8884d8" />
+      <Bar dataKey="marketCap" fill="#8884d8" name="Global Market Cap">
+        {data.map((entry, index) => (
+          <ReferenceLine
+            key={index}
+            // y={entry.marketCap}
+            stroke="#8884d8"
+            strokeWidth={3}
+            ifOverflow="extendDomain"
+            segment={[{ x: index - 0.2 }, { x: index + 0.2 }]}
+          />
+        ))}
+      </Bar>
     </BarChart>
   );
 
   return (
     <div style={{ width: "100%", height: "400px" }}>
-      <button onClick={toggleGraphType}>
-        Switch to {graphType === "line" ? "Candlestick" : "Line"} Graph
-      </button>
       <ResponsiveContainer>
         {graphType === "line" ? renderLineChart() : renderCandlestickChart()}
       </ResponsiveContainer>

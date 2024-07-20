@@ -7,8 +7,12 @@ import Header from "@/components/Header";
 import { useEffect, useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import LoadingScreen from "@/components/LoadingScreen";
+import Sidebar from "@/components/Sidebar";
 
-const lato = Lato({ weight: "300", subsets: ["latin"] });
+const lato = Lato({
+  weight: ["300", "400", "700", "100", "100", "900"],
+  subsets: ["latin"],
+});
 
 // export const metadata: Metadata = {
 //   title: "Create Next App",
@@ -35,8 +39,9 @@ export default function RootLayout({
           <Providers>
             <AnimatePresence>{isLoading && <LoadingScreen />}</AnimatePresence>
             {!isLoading && (
-              <div className="dark:bg-gradient-to-r select-none overflow-x-hidden from-[#17153B] to-[#070F2B]">
+              <div className="bg-gradient-to-t from-white via-yellow-50 to-[#FEFBD8] dark:bg-gradient-to-r select-none overflow-x-hidden dark:from-[#17153B] dark:to-[#070F2B]">
                 <Header />
+                <Sidebar />
                 {children}
               </div>
             )}
