@@ -17,17 +17,24 @@ const Header = () => {
   useEffect(() => {
     const savedSearches = localStorage.getItem("recentSearches");
     if (savedSearches) {
-      setRecentSearches(JSON.parse(savedSearches));
+      const parsedSearches = JSON.parse(savedSearches);
+      setRecentSearches(parsedSearches);
+      console.log("Loaded recent searches:", parsedSearches);
     }
   }, []);
 
   const handleSearchOpen = () => {
-    setSearchOpen((prev) => !prev);
+    setSearchOpen((prev) => {
+      console.log("Search open state:", !prev);
+      return !prev;
+    });
   };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
     setShowSuggestions(true);
+    console.log("Search term changed:", e.target.value);
+    console.log("Show suggestions set to true");
   };
 
   const handleSearchSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -40,7 +47,8 @@ const Header = () => {
       setRecentSearches(updatedSearches);
       localStorage.setItem("recentSearches", JSON.stringify(updatedSearches));
 
-      console.log("Searching for:", searchTerm);
+      console.log("Search submitted:", searchTerm);
+      console.log("Updated recent searches:", updatedSearches);
 
       setSearchTerm("");
       setShowSuggestions(false);
@@ -50,8 +58,12 @@ const Header = () => {
   const handleSuggestionClick = (suggestion: string) => {
     setSearchTerm(suggestion);
     setShowSuggestions(false);
-    console.log("Searching for:", suggestion);
+    console.log("Suggestion clicked:", suggestion);
   };
+
+  console.log("Render - searchOpen:", searchOpen);
+  console.log("Render - showSuggestions:", showSuggestions);
+  console.log("Render - recentSearches:", recentSearches);
 
   return (
     <div className="flex flex-row justify-between items-center p-5 bg-transparent w-full">
@@ -82,15 +94,23 @@ const Header = () => {
                   placeholder="Search..."
                   value={searchTerm}
                   onChange={handleSearchChange}
-                  onFocus={() => setShowSuggestions(true)}
+                  onFocus={() => {
+                    setShowSuggestions(true);
+                    console.log("Input focused, showSuggestions set to true");
+                  }}
                   onBlur={() =>
-                    setTimeout(() => setShowSuggestions(false), 200)
+                    setTimeout(() => {
+                      setShowSuggestions(false);
+                      console.log(
+                        "Input blurred, showSuggestions set to false after 500ms"
+                      );
+                    }, 5000)
                   }
                   className="w-full px-3 bg-transparent py-2 border dark:border-blue-900 focus:outline-none rounded-full"
                 />
               </form>
-              {showSuggestions && recentSearches.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 border dark:border-blue-900 rounded-md shadow-lg">
+              {
+                <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-gray-800 border dark:border-blue-900 rounded-md shadow-lg z-50">
                   {recentSearches.map((search, index) => (
                     <div
                       key={index}
@@ -101,7 +121,7 @@ const Header = () => {
                     </div>
                   ))}
                 </div>
-              )}
+              }
             </motion.div>
           )}
         </AnimatePresence>

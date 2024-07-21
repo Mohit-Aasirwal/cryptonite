@@ -44,7 +44,12 @@ const ExploreList = () => {
       setError(null);
       try {
         const response = await axios.get(
-          "https://api.coingecko.com/api/v3/companies/public_treasury/bitcoin"
+          "https://api.coingecko.com/api/v3/companies/public_treasury/bitcoin",
+          {
+            headers: {
+              "Access-Control-Allow-Origin": "*",
+            },
+          }
         );
         setData(response.data.companies);
       } catch (error) {

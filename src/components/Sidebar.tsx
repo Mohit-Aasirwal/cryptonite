@@ -30,7 +30,7 @@ const Sidebar = () => {
       >
         {Links.map((value, id) => (
           <div
-            className="flex flex-col items-center justify-center text-center text-gray-100 opacity-70 hover:opacity-100 hover:bg-gradient-to-tr hover:glassmorphic from-gray-600 to-gray-500 w-full transition duration-200 ease-linear rounded-md hover:text-white"
+            className="flex flex-col items-center justify-center text-center dark:text-gray-100 opacity-70 hover:opacity-100 hover:bg-gradient-to-tr hover:glassmorphic from-gray-600 to-gray-500 w-full transition duration-200 ease-linear rounded-md hover:text-white"
             key={id}
           >
             <Link

@@ -9,22 +9,53 @@ import axios from "axios";
 import Image from "next/image";
 import React, { useEffect, useState, useCallback } from "react";
 
+const CACHE_KEY = "single_coin_data";
+const CACHE_DURATION = 2 * 60 * 1000; // 2 minutes in milliseconds
+
 const SingleCoinChart = ({ coinId }: any) => {
   const [timeRange, setTimeRange] = useState("1D");
   const [extraData, setExtraData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const getCachedData = (id: string) => {
+    const cachedData = localStorage.getItem(`${CACHE_KEY}_${id}`);
+    if (cachedData) {
+      const { timestamp, data } = JSON.parse(cachedData);
+      if (Date.now() - timestamp < CACHE_DURATION) {
+        return data;
+      }
+    }
+    return null;
+  };
+
+  const setCachedData = (id: string, data: any) => {
+    const cacheData = {
+      timestamp: Date.now(),
+      data: data,
+    };
+    localStorage.setItem(`${CACHE_KEY}_${id}`, JSON.stringify(cacheData));
+  };
+
   const fetchData = useCallback(async (id: string, range: string) => {
+    const cachedData = getCachedData(id);
+    if (cachedData) {
+      setExtraData(cachedData);
+      setLoading(false);
+      return;
+    }
+
     const endpoint = `https://api.coingecko.com/api/v3/coins/${id}`;
     try {
       setLoading(true);
+      setError(null); // Reset error before fetching
       const response = await axios.get(endpoint, {
         headers: {
           "X-CG-Pro-API-Key": "CG-tvKmAT1u9LEXA2qCF1dkeJHw", // Replace with your actual API key
         },
       });
       setExtraData(response.data);
+      setCachedData(id, response.data);
       setLoading(false);
     } catch (error) {
       setError("Error fetching data. Please try again.");
@@ -34,7 +65,10 @@ const SingleCoinChart = ({ coinId }: any) => {
 
   useEffect(() => {
     fetchData(coinId, timeRange);
-    const interval = setInterval(() => fetchData(coinId, timeRange), 300000); // 5 minutes
+    const interval = setInterval(
+      () => fetchData(coinId, timeRange),
+      CACHE_DURATION
+    );
     return () => clearInterval(interval);
   }, [coinId, timeRange, fetchData]);
 
@@ -112,7 +146,9 @@ const SingleCoinChart = ({ coinId }: any) => {
                   <h1>Performance</h1>
                   <Performance
                     todayLow={extraData?.market_data?.low_24h?.usd || "loading"}
-                    todayHigh={extraData?.market_data?.high_24h?.usd || "loading"}
+                    todayHigh={
+                      extraData?.market_data?.high_24h?.usd || "loading"
+                    }
                     todayCurrent={
                       extraData?.market_data?.current_price?.usd || "loading"
                     }
@@ -131,7 +167,9 @@ const SingleCoinChart = ({ coinId }: any) => {
             </div>
             <Card>
               <div className="flex flex-col space-y-3 ">
-                <h1 className="text-xl font-semibold">About {extraData.name}</h1>
+                <h1 className="text-xl font-semibold">
+                  About {extraData.name}
+                </h1>
                 <LinksRender description={extraData?.description?.en}>
                   {extraData?.description?.en}
                 </LinksRender>

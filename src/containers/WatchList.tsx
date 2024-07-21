@@ -50,7 +50,7 @@ const WatchList = () => {
     name: coin.item.name,
     symbol: coin.item.symbol,
     market_cap_rank: coin.item.market_cap_rank,
-    price: coin.item.data.price, // Assuming price is under item.data.price
+    price: coin.item.data.price.toFixed(3), // Assuming price is under item.data.price
   }));
 
   return (

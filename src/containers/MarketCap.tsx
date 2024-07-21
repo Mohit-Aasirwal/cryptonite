@@ -1,46 +1,39 @@
 "use client";
 import Card from "@/components/Card";
 import Graph from "@/components/Graph";
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
 
 const MarketCap = () => {
   const [graphType, setGraphType] = useState("line");
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [data, setData] = useState<any>(null);
-
-  const fetchData = useCallback(async () => {
-    try {
-      setLoading(true);
-      const response = await axios.get(
-        "https://api.coingecko.com/api/v3/coins/markets",
-        {
-          params: {
-            vs_currency: "usd",
-            order: "market_cap_desc",
-            per_page: 10,
-            page: 1,
-          },
-        }
-      );
-      setData(response.data);
-      setLoading(false);
-    } catch (error) {
-      setError("Error fetching data. Please try again.");
-      setLoading(false);
-    }
-  }, []);
+  const [error, setError] = useState(null);
+  const [data, setData] = useState(null);
 
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const response = await axios.get("/api/marketCap");
+        setData(response.data);
+        setLoading(false);
+      } catch (error) {
+        setError("Error fetching data. Please try again.");
+        setLoading(false);
+      }
+    };
+
     fetchData();
-  }, [fetchData]);
+    // Set up an interval to fetch data every 2 minutes
+    const intervalId = setInterval(fetchData, 2 * 60 * 1000);
+
+    // Clean up the interval on component unmount
+    return () => clearInterval(intervalId);
+  }, []);
 
   const toggleGraphType = () => {
-    setGraphType((prevType: string) =>
-      prevType === "line" ? "candle" : "line"
-    );
+    setGraphType((prevType) => (prevType === "line" ? "candle" : "line"));
   };
 
   return (
@@ -64,7 +57,7 @@ const MarketCap = () => {
 
           <button
             className={`relative z-10 p-2 transition-all duration-200 ${
-              graphType === "line" ? "text-white " : "text-gray-500 "
+              graphType === "line" ? "dark:text-white " : "text-gray-500 "
             }`}
             onClick={toggleGraphType}
           >
@@ -73,7 +66,7 @@ const MarketCap = () => {
 
           <button
             className={`relative z-10 p-2 transition-all duration-200 ${
-              graphType === "candle" ? "text-white " : "text-gray-500 "
+              graphType === "candle" ? "dark:text-white " : "text-gray-500 "
             }`}
             onClick={toggleGraphType}
           >

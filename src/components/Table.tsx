@@ -85,7 +85,7 @@ const Table = ({
         placeholder="Search..."
         value={searchTerm}
         onChange={(e) => setSearchTerm(e.target.value)}
-        className="w-1/2 px-3 bg-transparent py-2 border dark:border-blue-300 focus:outline-none rounded-full"
+        className="w-1/2 px-3 bg-transparent py-2 border dark:border-blue-500 border-blue-400 focus:outline-none rounded-full"
       />
       <table className="min-w-full">
         <thead>

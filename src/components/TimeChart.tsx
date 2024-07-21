@@ -47,7 +47,12 @@ const TimeChart = ({ timeRange, coinId }: any) => {
 
       try {
         const response = await axios.get(
-          `https://api.coingecko.com/api/v3/coins/${coinId}/market_chart/range?vs_currency=usd&from=${from}&to=${now}&precision=3`
+          `https://api.coingecko.com/api/v3/coins/${coinId}/market_chart/range?vs_currency=usd&from=${from}&to=${now}&precision=3`,
+          {
+            headers: {
+              "Access-Control-Allow-Origin": "*",
+            },
+          }
         );
         const formattedData = response.data.prices.map(
           ([time, price]: any) => ({
