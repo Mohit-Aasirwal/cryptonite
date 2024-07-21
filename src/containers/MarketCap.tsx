@@ -8,7 +8,7 @@ import axios from "axios";
 const MarketCap = () => {
   const [graphType, setGraphType] = useState("line");
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState<any>(null);
   const [data, setData] = useState(null);
 
   useEffect(() => {

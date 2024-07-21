@@ -79,7 +79,7 @@ const Graph = ({ graphType }: any) => {
                 }}
               >
                 <p>{`Currency: ${label}`}</p>
-                <p>{`Global Market Cap: $${marketCap?.toFixed(2)} B`}</p>
+                <p>{`Global Market Cap: $${marketCap} B`}</p>
               </div>
             );
           }

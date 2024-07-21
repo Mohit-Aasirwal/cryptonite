@@ -112,7 +112,7 @@ const CompaniesByVolume = () => {
               columns={columns}
               // columnStyles={columnStyles}
               data={data}
-              // onRowClick={handleRowClick}
+              onRowClick={handleRowClick}
               itemsPerPage={10}
             />
           )}
