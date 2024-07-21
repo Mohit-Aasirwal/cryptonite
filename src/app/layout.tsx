@@ -28,7 +28,7 @@ export default function RootLayout({
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
-    }, 200);
+    }, 2000);
 
     return () => clearTimeout(timer);
   }, []);
@@ -39,7 +39,7 @@ export default function RootLayout({
           <Providers>
             <AnimatePresence>{isLoading && <LoadingScreen />}</AnimatePresence>
             {!isLoading && (
-              <div className="bg-gradient-to-t from-white via-yellow-50 to-[#FEFBD8] dark:bg-gradient-to-r select-none overflow-x-hidden dark:from-[#17153B] dark:to-[#070F2B]">
+              <div className="bg-gradient-to-t from-white via-yellow-50 to-[#FEFBD8] dark:bg-gradient-to-r select-none overflow-x-hidden dark:from-[#17153B] dark:to-[#070F2B] min-h-screen">
                 <Header />
                 <div className="relative z-50">
                   <Sidebar />

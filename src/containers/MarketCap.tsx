@@ -1,24 +1,55 @@
 "use client";
 import Card from "@/components/Card";
 import Graph from "@/components/Graph";
-import React, { useState } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
+import axios from "axios";
 
 const MarketCap = () => {
   const [graphType, setGraphType] = useState("line");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [data, setData] = useState<any>(null);
+
+  const fetchData = useCallback(async () => {
+    try {
+      setLoading(true);
+      const response = await axios.get(
+        "https://api.coingecko.com/api/v3/coins/markets",
+        {
+          params: {
+            vs_currency: "usd",
+            order: "market_cap_desc",
+            per_page: 10,
+            page: 1,
+          },
+        }
+      );
+      setData(response.data);
+      setLoading(false);
+    } catch (error) {
+      setError("Error fetching data. Please try again.");
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const toggleGraphType = () => {
     setGraphType((prevType: string) =>
       prevType === "line" ? "candle" : "line"
     );
   };
+
   return (
     <>
       <div className="flex flex-row justify-between items-center w-full">
-        <div className="">
+        <div>
           <h1 className="text-xl">Market Cap of the Top Currency Tokens</h1>
         </div>
-        <div className=" space-x-3 rounded-sm relative">
+        <div className="space-x-3 rounded-sm relative">
           <motion.div
             layout
             initial={{ opacity: 0 }}
@@ -51,7 +82,13 @@ const MarketCap = () => {
         </div>
       </div>
       <Card>
-        <Graph graphType={graphType} />
+        {loading ? (
+          <p>Loading...</p>
+        ) : error ? (
+          <p>{error}</p>
+        ) : (
+          <Graph graphType={graphType} data={data} />
+        )}
       </Card>
     </>
   );

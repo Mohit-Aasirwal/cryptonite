@@ -1,47 +1,66 @@
 "use client";
 import Table from "@/components/Table";
 import { useRouter } from "next/navigation";
-import React from "react";
+import React, { useState, useEffect } from "react";
+
+// Fetch watchlist data
+const fetchWatchListData = async () => {
+  const res = await fetch("https://api.coingecko.com/api/v3/search/trending");
+  const data = await res.json();
+  return data.coins; // Assuming you want to use the coins array
+};
 
 const WatchList = () => {
   const router = useRouter();
+  const [data, setData] = useState([]);
+
+  // Fetch data on component mount
+  useEffect(() => {
+    const fetchData = async () => {
+      const watchlistData = await fetchWatchListData();
+      setData(watchlistData);
+    };
+    fetchData();
+  }, []);
+
+  // Define columns for the table
   const columns = [
     { header: "Name", accessor: "name" },
-    { header: "Volume", accessor: "volume" },
-    { header: "Percentage", accessor: "percentage" },
+    { header: "Symbol", accessor: "symbol" },
+    { header: "Market Cap Rank", accessor: "market_cap_rank" },
+    { header: "Current Price", accessor: "price" },
   ];
-  const data = [
-    { name: "John Doe", volume: 1000, percentage: "10%" },
-    { name: "Jane Doe", volume: 2000, percentage: "20%" },
-    { name: "Jim Beam", volume: 3000, percentage: "30%" },
-    { name: "Alice Smith", volume: 1500, percentage: "15%" },
-    { name: "Bob Johnson", volume: 2500, percentage: "25%" },
-    { name: "Carol White", volume: 3500, percentage: "35%" },
-    { name: "David Brown", volume: 4000, percentage: "40%" },
-    { name: "Eve Green", volume: 4500, percentage: "45%" },
-    { name: "Frank Black", volume: 5000, percentage: "50%" },
-    { name: "Grace Lee", volume: 5500, percentage: "55%" },
-    { name: "Henry Ford", volume: 6000, percentage: "60%" },
-    { name: "Ivy Chen", volume: 6500, percentage: "65%" },
-  ];
+
+  // Define styles for table columns
   const columnStyles = {
-    token: "text-left",
-    symbol: "text-right",
-    volume: "text-left",
+    name: "text-left",
+    symbol: "text-left",
+    market_cap_rank: "text-right",
+    price: "text-right",
   };
+
+  // Handle row click
   const handleRowClick = (row: any) => {
-    // alert(`Row clicked: ${JSON.stringify(row)}`);
-    console.log("row clicked", row);
-    router.push(`/${row.name}`);
+    router.push(`/${row.id}`);
   };
+
+  // Map data to table rows
+  const tableData = data.map((coin: any) => ({
+    id: coin.item.id,
+    name: coin.item.name,
+    symbol: coin.item.symbol,
+    market_cap_rank: coin.item.market_cap_rank,
+    price: coin.item.data.price, // Assuming price is under item.data.price
+  }));
+
   return (
     <div>
       <Table
         columns={columns}
-        columnStyles={columnStyles}
-        data={data}
+        // columnStyles={columnStyles}
+        data={tableData}
         onRowClick={handleRowClick}
-        itemsPerPage={25}
+        itemsPerPage={10}
       />
     </div>
   );

@@ -6,7 +6,7 @@ import classNames from "classnames";
 type TableTypes = {
   data: any;
   columns: any;
-  columnStyles: any;
+  columnStyles?: any;
   onRowClick?: any;
   itemsPerPage: number;
 };
@@ -51,7 +51,7 @@ const Table = ({
   const paginatedData = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
     return filteredData.slice(startIndex, startIndex + itemsPerPage);
-  }, [filteredData, currentPage]);
+  }, [filteredData, currentPage, itemsPerPage]);
 
   const pageCount = Math.ceil(filteredData.length / itemsPerPage);
 
@@ -79,7 +79,7 @@ const Table = ({
   };
 
   return (
-    <div className="table-container space-y-5">
+    <div className="table-container space-y-5 min-h-80 justify-between">
       <input
         type="text"
         placeholder="Search..."
